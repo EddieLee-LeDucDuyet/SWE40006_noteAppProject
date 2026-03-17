@@ -24,6 +24,9 @@ jobs:
 
       - name: Verify image exists
         run: docker image inspect noteflow:latest
+        
+      - name: Save Docker image
+        run: docker save noteflow:latest -o /tmp/noteflow.tar
 
       - name: Upload image as artifact
         uses: actions/upload-artifact@v4
