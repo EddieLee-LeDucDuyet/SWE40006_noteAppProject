@@ -67,23 +67,23 @@ jobs:
       - name: Deploy to Railway
         run: railway up --detach
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_TOKEN: ${{secrets.RAILWAY_TOKEN}}
+          RAILWAY_PROJECT_ID: ${{secrets.RAILWAY_PROJECT_ID}}
 
       - name: Wait for deployment
         run: sleep 30
 
       - name: Health check on live server
         run: |
-          curl --fail ${{ secrets.RAILWAY_URL }}/health
+          curl --fail ${{secrets.RAILWAY_URL}}/health
           echo "✅ Health check passed!"
 
       - name: Metrics check on live server
         run: |
-          curl --fail ${{ secrets.RAILWAY_URL }}/metrics
+          curl --fail ${{secrets.RAILWAY_URL}}/metrics
           echo "✅ Metrics endpoint verified!"
 
       - name: Confirm deployment
         run: |
           echo "✅ NoteFlow successfully deployed to Railway!"
-          echo "🌐 Live at ${{ secrets.RAILWAY_URL }}"
+          echo "🌐 Live at ${{secrets.RAILWAY_URL}}"
