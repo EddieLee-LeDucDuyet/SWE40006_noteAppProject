@@ -60,15 +60,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Railway CLI
-        run: |
-          curl -fsSL https://railway.app/install.sh | sh
-          echo "$HOME/.railway/bin" >> $GITHUB_PATH
+        run: npm install -g @railway/cli
 
       - name: Deploy to Railway
-        run: railway up --detach
+        run: railway up --detach --service ${{ secrets.RAILWAY_SERVICE_NAME }}
         env:
-          RAILWAY_TOKEN: ${{secrets.RAILWAY_TOKEN}}
-          RAILWAY_PROJECT_ID: ${{secrets.RAILWAY_PROJECT_ID}}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
 
       - name: Wait for deployment
         run: sleep 30
