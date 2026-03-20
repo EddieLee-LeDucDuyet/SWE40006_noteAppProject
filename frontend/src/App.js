@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API = 'http://localhost:5000/api/notes';
 
 function App() {
   const [notes, setNotes]     = useState([]);
