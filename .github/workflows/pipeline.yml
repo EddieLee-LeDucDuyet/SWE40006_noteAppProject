@@ -1,4 +1,4 @@
-yamlname: NoteFlow CI/CD Pipeline
+name: NoteFlow CI/CD Pipeline
 
 on:
   push:
