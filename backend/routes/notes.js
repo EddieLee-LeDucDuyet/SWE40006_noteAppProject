@@ -1,55 +1,64 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../database');
+const request = require('supertest');
+const app = require('../server');
 
-// GET all notes for this user
-router.get('/', (req, res) => {
-  const userId = req.headers['x-user-id'] || 'default';
-  const notes = db.prepare(
-    'SELECT * FROM notes WHERE user_id = ? ORDER BY created_at DESC'
-  ).all(userId);
-  res.json(notes);
+const TEST_USER = { 'x-user-id': 'test-user-123' };
+
+describe('Notes API', () => {
+  let createdId;
+
+  test('GET /health returns OK', async () => {
+    const res = await request(app).get('/health');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('OK');
+  });
+
+  test('GET /metrics returns server stats', async () => {
+    const res = await request(app).get('/metrics');
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('server');
+    expect(res.body).toHaveProperty('memory');
+    expect(res.body).toHaveProperty('performance');
+    expect(res.body).toHaveProperty('requests');
+  });
+
+  test('POST /api/notes creates a note', async () => {
+    const res = await request(app)
+      .post('/api/notes')
+      .set(TEST_USER)
+      .send({ title: 'Test Note', body: 'This is a test' });
+    expect(res.statusCode).toBe(201);
+    expect(res.body.title).toBe('Test Note');
+    createdId = res.body.id;
+  });
+
+  test('GET /api/notes returns list', async () => {
+    const res = await request(app)
+      .get('/api/notes')
+      .set(TEST_USER);
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  test('PUT /api/notes/:id updates a note', async () => {
+    const res = await request(app)
+      .put(`/api/notes/${createdId}`)
+      .set(TEST_USER)
+      .send({ title: 'Updated', body: 'Updated body' });
+    expect(res.statusCode).toBe(200);
+  });
+
+  test('DELETE /api/notes/:id deletes a note', async () => {
+    const res = await request(app)
+      .delete(`/api/notes/${createdId}`)
+      .set(TEST_USER);
+    expect(res.statusCode).toBe(200);
+  });
+
+  test('POST /api/notes returns 400 if fields missing', async () => {
+    const res = await request(app)
+      .post('/api/notes')
+      .set(TEST_USER)
+      .send({ title: '' });
+    expect(res.statusCode).toBe(400);
+  });
 });
-
-// GET single note
-router.get('/:id', (req, res) => {
-  const userId = req.headers['x-user-id'] || 'default';
-  const note = db.prepare(
-    'SELECT * FROM notes WHERE id = ? AND user_id = ?'
-  ).get(req.params.id, userId);
-  if (!note) return res.status(404).json({ error: 'Note not found' });
-  res.json(note);
-});
-
-// POST create note
-router.post('/', (req, res) => {
-  const userId = req.headers['x-user-id'] || 'default';
-  const { title, body } = req.body;
-  if (!title || !body) return res.status(400).json({ error: 'Title and body are required' });
-  const result = db.prepare(
-    'INSERT INTO notes (user_id, title, body) VALUES (?, ?, ?)'
-  ).run(userId, title, body);
-  res.status(201).json({ id: result.lastInsertRowid, user_id: userId, title, body });
-});
-
-// PUT update note
-router.put('/:id', (req, res) => {
-  const userId = req.headers['x-user-id'] || 'default';
-  const { title, body } = req.body;
-  if (!title || !body) return res.status(400).json({ error: 'Title and body are required' });
-  db.prepare(
-    'UPDATE notes SET title = ?, body = ? WHERE id = ? AND user_id = ?'
-  ).run(title, body, req.params.id, userId);
-  res.json({ success: true });
-});
-
-// DELETE note
-router.delete('/:id', (req, res) => {
-  const userId = req.headers['x-user-id'] || 'default';
-  db.prepare(
-    'DELETE FROM notes WHERE id = ? AND user_id = ?'
-  ).run(req.params.id, userId);
-  res.json({ success: true });
-});
-
-module.exports = router;
