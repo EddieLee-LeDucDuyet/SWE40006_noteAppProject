@@ -1,7 +1,22 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
-const API = 'http://localhost:5000/api/notes';
+const API = '/api/notes';
+
+function getUserId() {
+  let id = localStorage.getItem('user_id');
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem('user_id', id);
+  }
+  return id;
+}
+
+const USER_ID = getUserId();
+const HEADERS = {
+  'Content-Type': 'application/json',
+  'x-user-id': USER_ID
+};
 
 function App() {
   const [notes, setNotes]     = useState([]);
@@ -13,7 +28,7 @@ function App() {
   useEffect(() => { fetchNotes(); }, []);
 
   async function fetchNotes() {
-    const res = await fetch(API);
+    const res = await fetch(API, { headers: HEADERS });
     setNotes(await res.json());
   }
 
@@ -23,13 +38,13 @@ function App() {
     if (!title.trim() || !body.trim()) return setError('Both fields are required.');
     if (editing) {
       await fetch(`${API}/${editing}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        method: 'PUT', headers: HEADERS,
         body: JSON.stringify({ title, body }),
       });
       setEditing(null);
     } else {
       await fetch(API, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: HEADERS,
         body: JSON.stringify({ title, body }),
       });
     }
@@ -38,7 +53,7 @@ function App() {
   }
 
   async function handleDelete(id) {
-    await fetch(`${API}/${id}`, { method: 'DELETE' });
+    await fetch(`${API}/${id}`, { method: 'DELETE', headers: HEADERS });
     fetchNotes();
   }
 
