@@ -39,6 +39,9 @@ header p {
   margin-bottom: 16px;
   color: #2563eb;
 }
+.auth-form {
+  margin-bottom: 20px;
+}
 .form input,
 .form textarea {
   width: 100%;
@@ -77,6 +80,21 @@ button.del:hover {
 }
 button[type="button"] {
   background: #6b7280;
+}
+
+.user-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.user-bar p {
+  color: #1e3a8a;
 }
 
 .error {

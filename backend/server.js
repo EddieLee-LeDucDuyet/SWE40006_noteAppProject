@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const os = require('os');
 const notesRouter = require('./routes/notes');
+const authRouter = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,8 +37,10 @@ const statusMonitor = require('express-status-monitor')({
 app.use(statusMonitor);
 
 // ── Core Middleware ────────────────────────────────────────────
-app.use(cors());
+const frontendOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
+app.use(cors({ origin: frontendOrigin, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 // ── Request counter ────────────────────────────────────────────
 let requestCount = 0;
@@ -93,6 +97,7 @@ app.get('/metrics', (req, res) => {
 });
 
 // ── Notes API ──────────────────────────────────────────────────
+app.use('/api/auth', authRouter);
 app.use('/api/notes', notesRouter);
 
 // ── Serve React frontend in production ─────────────────────────
