@@ -242,6 +242,10 @@ Developer pushes code to GitHub
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Health check |
+| POST | `/api/auth/register` | Register new user and set auth cookie |
+| POST | `/api/auth/login` | Login user and set auth cookie |
+| POST | `/api/auth/logout` | Logout user and clear auth cookie |
+| GET | `/api/auth/me` | Get currently authenticated user |
 | GET | `/api/notes` | Get all notes |
 | GET | `/api/notes/:id` | Get a single note |
 | POST | `/api/notes` | Create a new note |
