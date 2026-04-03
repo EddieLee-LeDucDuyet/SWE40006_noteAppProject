@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
-const NOTES_API = 'http://localhost:5000/api/notes';
-const AUTH_API = 'http://localhost:5000/api/auth';
+const NOTES_API = '/api/notes';
+const AUTH_API = 'api/auth';
 
 function App() {
   const [user, setUser]       = useState(null);
